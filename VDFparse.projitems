@@ -6,22 +6,19 @@
     <Product>VDFparse</Product>
     <Description>Parses and displays info about Steam .vdf files</Description>
     <Version>3.0</Version>
-    <Authors>Simon Sawicki (Grub4K)</Authors>
-    <Copyright>Copyright (c) 2021-2022 Simon Sawicki</Copyright>
+    <Authors>Grub4K (Simon Sawicki)</Authors>
+    <Copyright>© Simon Sawicki 2022</Copyright>
 
     <TargetFramework>net6</TargetFramework>
     <LangVersion>latest</LangVersion>
 
-    <AnalysisMode>Recommended</AnalysisMode>
+    <AnalysisMode>All</AnalysisMode>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
 
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
-    <Deterministic>true</Deterministic>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-
-    <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
 </Project>

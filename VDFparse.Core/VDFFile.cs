@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace VDFparse;
 
 public interface IVDFFileReader
@@ -8,55 +10,57 @@ public interface IVDFFileReader
 
 public class VDFFile
 {
-    VDFFile() { }
-
-    public static List<IVDFFileReader> Readers { get; } = new()
+    private static List<IVDFFileReader> VdfFileReaders = new()
     {
-        new AppInfoReader(),
-        new PackageInfoReader(),
         new PackageInfoReaderOld(),
+        new PackageInfoReader(),
+        new AppInfoReader(),
     };
 
     public List<Dataset> Datasets { get; private set; } = new();
 
-    public EUniverse EUniverse { get; private set; }
+    public EUniverse Universe { get; private set; }
 
-    public static VDFFile Read(string filename)
+    public void Read(string filename)
     {
         using var fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
 
-        return Read(fs);
+        Read(fs);
     }
 
-    public static VDFFile Read(Stream stream)
+    public void Read(Stream stream)
     {
-        var vdfFile = new VDFFile();
-
         using var reader = new BinaryReader(stream);
 
         var magic = reader.ReadUInt32();
-        vdfFile.EUniverse = (EUniverse)reader.ReadUInt32();
-        foreach (var vdfFileReader in Readers)
+        Universe = (EUniverse)reader.ReadUInt32();
+        foreach (var vdfFileReader in VdfFileReaders)
         {
             if (magic == vdfFileReader.Magic)
             {
-                vdfFile.Datasets = vdfFileReader.Read(reader);
-                return vdfFile;
+                Datasets = vdfFileReader.Read(reader);
+                return;
             }
         }
 
         throw new InvalidDataException($"Unknown header: {magic:X8}");
     }
+
+    public Dataset? FindByID(uint id)
+    {
+        foreach (var dataset in Datasets)
+        {
+            if (dataset.ID == id)
+            {
+                return dataset;
+            }
+        }
+        return null;
+    }
 }
 
-public class Dataset
-{
-    public uint Id { get; init; }
-    public byte[] Hash { get; init; } = null!;
-    public ulong Token { get; init; }
-    public uint ChangeNumber { get; init; }
-    public KVObject Data { get; init; } = null!;
-}
+public record Dataset(uint ID, ReadOnlyCollection<byte> Hash,
+    ulong Token, uint ChangeNumber, KVObject Data);
 
 public enum EUniverse
 {
